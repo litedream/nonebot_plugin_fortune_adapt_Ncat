@@ -68,7 +68,8 @@ def drawing(gid: str, uid: str, theme: str, spec_path: Optional[str] = None) -> 
         "text": f"{fortune_config.fortune_path}/font/sakura.ttf",
     }
     ttfront = ImageFont.truetype(fontPath["title"], font_size)
-    font_length = ttfront.getsize(title)
+    x0, y0, x1, y1 = ttfront.getbbox(title)
+    font_length = [x1 - x0, y1 - y0]
     draw.text(
         (
             image_font_center[0] - font_length[0] / 2,

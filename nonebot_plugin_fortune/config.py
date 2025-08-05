@@ -3,11 +3,12 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
-from nonebot import get_driver
-from nonebot.log import logger
-from pydantic import BaseModel, Extra, root_validator
+from ncatbot.utils import get_log
+from pydantic import BaseModel, Extra, root_validator, model_validator
 
 from .download import ResourceError, download_resource
+
+logger = get_log()
 
 """
 	抽签主题对应表，第一键值为“抽签设置”或“主题列表”展示的主题名称
@@ -73,7 +74,8 @@ class ThemesFlagConfig(BaseModel, extra=Extra.ignore):
     touhou_old_flag: bool = True
     warship_girls_r_flag: bool = True
 
-    @root_validator
+    @classmethod
+    @model_validator(mode="after")
     def check_all_disabled(cls, values) -> None:
         """Check whether all themes are DISABLED"""
         flag: bool = False
@@ -102,13 +104,17 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-driver = get_driver()
-fortune_config: PluginConfig = PluginConfig.parse_obj(driver.config.dict())
-themes_flag_config: ThemesFlagConfig = ThemesFlagConfig.parse_obj(driver.config.dict())
+# driver = get_driver()
+fortune_config: PluginConfig = PluginConfig()
+themes_flag_config: ThemesFlagConfig = ThemesFlagConfig()
 
 
-@driver.on_startup
-async def fortune_check() -> None:
+async def fortune_check(data: dict) -> None:
+    global fortune_config, themes_flag_config
+
+    fortune_config = PluginConfig.parse_obj(data)
+    themes_flag_config = ThemesFlagConfig.parse_obj(data)
+
     if not fortune_config.fortune_path.exists():
         fortune_config.fortune_path.mkdir(parents=True, exist_ok=True)
 

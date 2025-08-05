@@ -6,7 +6,9 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from .config import DateTimeEncoder, FortuneThemesDict, fortune_config
 from .utils import drawing, theme_flag_check
+from ncatbot.utils import get_log
 
+logger = get_log()
 
 class FortuneManager:
     def __init__(self):
@@ -77,7 +79,8 @@ class FortuneManager:
         if not self._multi_divine_check(gid, uid, now_time):
             try:
                 img_path = drawing(gid, uid, theme, spec_path)
-            except Exception:
+            except Exception as e:
+                logger.error(e, exc_info=True)
                 return True, None
 
             # Record the sign-in time

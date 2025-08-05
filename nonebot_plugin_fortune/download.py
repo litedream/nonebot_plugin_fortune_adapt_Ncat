@@ -3,7 +3,9 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import httpx
-from nonebot.log import logger
+from ncatbot.utils import get_log
+
+logger = get_log()
 
 
 class ResourceError(Exception):
