@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from .config import DateTimeEncoder, FortuneThemesDict, fortune_config
-from .utils import drawing, theme_flag_check
+from .utils import drawing, theme_flag_check, get_copywriting
 from ncatbot.utils import get_log
 
 logger = get_log()
@@ -62,7 +62,7 @@ class FortuneManager:
         uid: str,
         _theme: Optional[str] = None,
         spec_path: Optional[str] = None,
-    ) -> Tuple[bool, Optional[Path]]:
+    ) -> Tuple[bool, Optional[Path], str, str]:
         """
         今日运势抽签，主题已确认合法
         """
@@ -78,17 +78,25 @@ class FortuneManager:
 
         if not self._multi_divine_check(gid, uid, now_time):
             try:
-                img_path = drawing(gid, uid, theme, spec_path)
+                title, text = get_copywriting()
+                self._load_data()
+                self._user_data[gid][uid]["title"] = title
+                self._user_data[gid][uid]["text"] = text
+                self._save_data()
+                img_path = drawing(gid, uid, theme, title, text, spec_path)
             except Exception as e:
                 logger.error(e, exc_info=True)
-                return True, None
+                return True, None, "", "抽签失败，请稍后再试"
 
             # Record the sign-in time
             self._end_data_handle(gid, uid, now_time)
-            return True, img_path
+            return True, img_path, title, text
         else:
+            self._load_data()
+            title: str = self._user_data[gid][uid]["title"]
+            text: str = self._user_data[gid][uid]["text"]
             img_path: Path = fortune_config.fortune_path / "out" / f"{gid}_{uid}.png"
-            return False, img_path
+            return False, img_path, title, text
 
     @staticmethod
     def clean_out_pics() -> None:

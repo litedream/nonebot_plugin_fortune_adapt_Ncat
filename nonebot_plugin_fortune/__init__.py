@@ -63,7 +63,7 @@ async def generalDivine(arg: str, gid: str, uid: str) -> str|MessageChain:
     if "帮助" in arg[-2:]:
         return __fortune_usages__
 
-    is_first, image_file = fortune_manager.divine(gid, uid, None, None)
+    is_first, image_file, title, text = fortune_manager.divine(gid, uid, None, None)
     if image_file is None:
         return "今日运势生成出错……"
 
@@ -88,7 +88,7 @@ async def specificDivine(
             if not FortuneManager.theme_enable_check(theme):
                 return "该抽签主题未启用~"
             else:
-                is_first, image_file = fortune_manager.divine(gid, uid, theme, None)
+                is_first, image_file, title, text = fortune_manager.divine(gid, uid, theme, None)
                 if image_file is None:
                     return "今日运势生成出错……"
 
@@ -121,7 +121,7 @@ async def limit_setting(limit: str, gid: str, uid: str):
     logger.warning("指定签底抽签功能将在 v0.5.x 弃用")
 
     if limit == "随机":
-        is_first, image_file = fortune_manager.divine(gid, uid, None, None)
+        is_first, image_file, title, text = fortune_manager.divine(gid, uid, None, None)
         if image_file is None:
             return "今日运势生成出错……"
     else:
@@ -129,7 +129,7 @@ async def limit_setting(limit: str, gid: str, uid: str):
         if not spec_path:
             return "还不可以指定这种签哦，请确认该签底对应主题开启或图片路径存在~"
         else:
-            is_first, image_file = fortune_manager.divine(gid, uid, None, spec_path)
+            is_first, image_file, title, text = fortune_manager.divine(gid, uid, None, spec_path)
             if image_file is None:
                 return "今日运势生成出错……"
 

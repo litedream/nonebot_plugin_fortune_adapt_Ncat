@@ -50,14 +50,14 @@ def random_basemap(theme: str, spec_path: Optional[str] = None) -> Path:
     return p
 
 
-def drawing(gid: str, uid: str, theme: str, spec_path: Optional[str] = None) -> Path:
+def drawing(gid: str, uid: str, theme: str, title: str, text: str, spec_path: Optional[str] = None) -> Path:
     # 1. Random choice a base image
     imgPath: Path = random_basemap(theme, spec_path)
     img: Image.Image = Image.open(imgPath).convert("RGB")
     draw = ImageDraw.Draw(img)
 
     # 2. Random choice a luck text with title
-    title, text = get_copywriting()
+
 
     # 3. Draw
     font_size = 45
